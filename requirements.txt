@@ -1,0 +1,17 @@
+flask
+flask-cors
+pandas
+pdfplumber
+openpyxl
+langchain
+langchain-core
+langchain-community
+langchain-groq
+langchain-text-splitters
+sentence-transformers
+chromadb
+gunicorn
+gspread
+google-auth
+gunicorn
+gunicorn==21.2.0
