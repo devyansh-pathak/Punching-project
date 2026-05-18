@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Punching Automation</title>
+    <style>
+        body{
+            font-family: Arial, Helvetica, sans-serif;
+            background: linear-gradient(200deg, #c084fc, #8b5cf6, #6366f1);
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 30px 40px;
+            background: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        h1{ text-align: center; color: rgb(246, 163, 10); }
+        h3{ text-align: center; color: #555; }
+        .drop-zone {
+            border: 1.5px dashed #ccc;
+            border-radius: 12px;
+            padding: 2.8rem 2rem;
+            height: 100px;
+            text-align: center;
+            cursor: pointer;
+            position: relative;
+            background: rgb(37, 37, 37);
+            transition: background 0.2s, border-color 0.2s;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .drop-zone p { color: white; margin: 0; }
+        .drop-zone.drag-over { background: #eef4ff; border-color: #6699ff; }
+        .drop-zone input[type="file"] {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            cursor: pointer;
+            width: 100%;
+            height: 100%;
+        }
+        #filename {
+            color: #8b5cf6;
+            font-size: 13px;
+            margin-bottom: 20px;
+            display: none;
+        }
+        .field {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin-bottom: 20px;
+        }
+        .field label {
+            font-size: 13px;
+            font-weight: 600;
+            color: #4c1d95;
+            padding-left: 10px;
+            border-left: 3px solid #8b5cf6;
+        }
+        .field input {
+            padding: 9px 12px;
+            font-size: 14px;
+            border: 2px solid #ccc;
+            border-radius: 8px;
+            background: #fff;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        .field input:focus {
+            outline: none;
+            border-color: #8b5cf6;
+            box-shadow: 0 0 0 3px #ede9fe;
+        }
+        input[type="number"]::-webkit-outer-spin-button,
+        input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; }
+        input[type="number"] { -moz-appearance: textfield; }
+
+        #dropdownlist {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            z-index: 999;
+            background: #fff;
+            border: 1.5px solid #8b5cf6;
+            border-radius: 8px;
+            max-height: 220px;
+            overflow-y: auto;
+            overflow-x: hidden;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+            display: none;
+        }
+        #dropdownlist.open { display: block; }
+        .dd-item {
+            padding: 10px 14px;
+            font-size: 13px;
+            color: #333;
+            cursor: pointer;
+            border-bottom: 0.5px solid #eee;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .dd-item:last-child { border-bottom: none; }
+        .dd-item:hover { background: #ede9fe; color: #4c1d95; }
+
+        .btn-wrap {
+            display: flex;
+            justify-content: center;
+            margin-top: 28px;
+        }
+        button[type="submit"] {
+            padding: 10px 36px;
+            font-size: 15px;
+            font-weight: bold;
+            background: #ff9b21;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+        button:hover { background-color: #d04fff; }
+
+        #result-table th {
+            background: #8b5cf6;
+            color: white;
+            padding: 10px 14px;
+            text-align: left;
+            white-space: nowrap; 
+        }
+        #result-table td {
+            padding: 9px 14px;
+            border-bottom: 1px solid #eee;
+            color: #333;
+            white-space: nowrap;
+            cursor: pointer;
+        }
+
+        #result-table td:focus {
+            outline: 2px solid #8b5cf6;
+            background: #f5f0ff;
+        }
+        #result-table tr:nth-child(even) td { background: #f9f5ff; }
+        #result-table tr:hover td { background: #ede9fe; }
+        #result-wrap > div {
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>PUNCHING AUTOMATION</h1>
+        <h3>Make your punching easy !!</h3>
+
+        <div class="drop-zone" id="dropzone">
+            <input type="file" id="fileinput" accept=".pdf" />
+            <p>📄 Drop PDF files here or click to browse...</p>
+        </div>
+        <p id="filename"></p>
+
+        <div class="field">
+            <label for="searchinput">Enter the code of associate</label>
+            <div style="position: relative;">
+                <input type="text" id="searchinput" placeholder="Search..." />
+                <div id="dropdownlist"></div>
+            </div>
+        </div>
+
+        <div class="field">
+            <label for="cr">Enter the commission percentage received</label>
+            <input type="number" id="cr" placeholder="0" />
+        </div>
+
+        <div class="field">
+            <label for="cg">Enter the commission percentage gave to associate</label>
+            <input type="number" id="cg" placeholder="0" />
+        </div>
+        <div class="field">
+            <label>Payemnt Status</label>
+            <div style="display:flex; gap:10px;">
+                <button type="button" id="btn-c2p" style="padding:9px 24px; font-size:14px; font-weight:bold; background:#e0d7ff; color:#6366f1; border:2px solid #6366f1; border-radius:8px; cursor:pointer;">C2P</button>
+                <button type="button" id="btn-done" style="padding:9px 24px; font-size:14px; font-weight:bold; background:#dcfce7; color:#22c55e; border:2px solid #22c55e; border-radius:8px; cursor:pointer;">Done</button>
+                <button type="button" id="btn-pending" style="padding:9px 24px; font-size:14px; font-weight:bold; background:#ffedd5; color:#f97316; border:2px solid #f97316; border-radius:8px; cursor:pointer;">Pending</button>
+            </div>
+        </div>
+
+        <div class="btn-wrap">
+            <button type="submit" id="submitbutton">Submit</button>
+        </div>
+
+        <div id="result-wrap" style="max-width:800px; margin:24px auto; display:none;">
+            <div style="background:#fff; border-radius:10px; padding:24px 30px;
+            box-shadow:0 4px 6px rgba(0,0,0,0.1); overflow-x:auto;">
+                <h3 style="color:#4c1d95; margin-top:0;">📊 Result</h3>
+                <table id="result-table" style="width:100%; border-collapse:collapse; font-size:13px;">
+                </table>
+            </div>
+        </div>
+        <div id="punch-wrap" style="max-width:800px; margin:0 auto 40px; 
+            display:none; justify-content:center;">
+            <button id="punchbutton" style="padding:10px 36px; font-size:15px;
+                font-weight:bold; background:#8b5cf6; color:white;
+                border:none; border-radius:8px; cursor:pointer;">
+                Punch
+            </button>
+        </div>
+    </div>
+
+    <script>
+        let paymentStatus = '';
+        document.getElementById('btn-c2p').addEventListener('click', () => setStatus('C2P'));
+        document.getElementById('btn-done').addEventListener('click', () => setStatus('Done'));
+        document.getElementById('btn-pending').addEventListener('click', () => setStatus('Pending'));
+
+
+        function setStatus(status) {
+            paymentStatus = status;
+            document.getElementById('btn-c2p').style.opacity     = status === 'C2P'     ? '1' : '0.4';
+            document.getElementById('btn-done').style.opacity    = status === 'Done'    ? '1' : '0.4';
+            document.getElementById('btn-pending').style.opacity = status === 'Pending' ? '1' : '0.4';
+        }
+        const options = ['800100001013 BIRENDERA PRASAD', '900100001139 NAVEEN GUPTA',
+            '900100001184 HARSHIT BANSAL', '800100001014 ROHUL AMIN SHEIKH',
+            '900100001180 KHUSHI/VIJIT BUMB', '900100001109 VINOD KUMAR NARULA',
+            '900100001150 DEVINDER SINGH SALUJA', '900100001009 AVINASH KHARE',
+            '900100001040 SATISH KUMAR JAIN', '900100001039 SUMANTA KUMAR MOHANTY',
+            '900100001007 NARESH KUMAR', '900100001237 CHETANYA',
+            '900100001147 DIMPLE KUMAR SHARMA', '900100001202 ROSHAN PATIDAR',
+            '900100001006 SATWINDER-INSURANCE DEKHO', '900100001003 RAMESH CHAKERVERTY',
+            '900100001181 Saurabh-Ref Anurag Dwedi', '900100001028 MRITUNJAY JHA',
+            '900100001234 SUMAN SINGH', '700104101118 Mamta Sharma/DARPAN JI',
+            '900100001171 MAHENDER SINGH', '900100001046 AJIT SINGH',
+            '900100001012 ANURAG DWEDI', '800100001041 Mamta Gupta (AMIT GUPTA)',
+            '900100001223 RANJEET SINGH', '900100001002 MUKESH-INDIABULLS',
+            '900100001220 ATUL KUMAR', '900100001108 Megha mishra',
+            '900100001215 RIYA MANDAL', '900100001116 MOHIT ARORA',
+            '900100001182 Ashalata jain', '900100001224 VAIBHAV JAIN',
+            '700104101042 POONAM (VIKAS)', '900100001191 MOHAN LAL GOEL',
+            '900100001144 ABHISHEK SHARMA', '700104101240 Virendra Kumar',
+            '900100001082 ASHISH KUMAR SHRIVASTAVA(AVINASH REF.)',
+            '900100001008 DEEPAK CHANDRA', '900100001004 RAJ KUMAR-KPAR OFFICE HEALTH',
+            '900100001156 HARNEK SINGH', '900100001192 MUSHARRAF HUSAIN',
+            '900100001177 MOHIT BHARDWAJ', '900100001219 TEGVEER SINGH',
+            '800100001104 Shruti', '700101301213 PRASHANT KUMAR SINHA',
+            '900100001016 Brij Bhushan Shukla', '900100001143 ASHOK SAINI',
+            '900100001137 ANURAG TIWARI', '900100001189 MOHAMMED ISHRAT',
+            '900100001032 PRADIP KUMAR GUPTA', '900100001027 DEVENDER SINGH',
+            '900100001188 NAVEEN KUMAR', '900100001059 SHUBHAM PATHAK',
+            '900100001011 SHILPA THAKRAL(KAUSHAL REF.)',
+            '900100001242 MR. BALDEV SARAN GUMBER', '900100001153 DEEPAK SHARMA',
+            '900100001075 PARAS NATH YADAV', '900100001165 sumanjit Das',
+            '900100001068 NEERAJ KHARBANDA', '900100001083 RINKY SINGH(KISHORE)',
+            '900100001107 Pardeep mourya', '900100001140 POONAM/AMIT KUMAR SHARMA',
+            '900100001178 KOMAL GARG', '900100001245 MR. CHARAN SINGH',
+            '900100001206 RITU MALPANI', '900100001024 AHMAD SAHID',
+            '900100001218 MAHESH CHANDRA AGARWAL', '900100001174 JITENDRA PAL',
+            '900100001246 MR. VONOD SINGH BISHT', '900100001235 BHANU PRATAP',
+            '900100001152 GURPREET SINGH', '900100001168 KRISHAN LAL DUSEJA',
+            '900100001250 MR. G B NAILWAL', '900100001022 DILWAR HUSSAIN',
+            '900100001001 SHEKHAR BITHER', '900100001166 HUKAM CHAND',
+            '900100001163 RAMESH  CHAND DHAMEJANI',
+            '900100001060 PRABHA KANOZIA/VIJAY KUMAR KANOZIA',
+            '900100001249 MR. VIRENDER KUMAR', '900100001237 Chetanya Nangia',
+            '700104101054 Kuldeep Singh', '700105401247 HARKIRAT SINGH',
+            '900100001204 SHEELA DEVI', '900100001232 SHUBHAM PAL',
+            '900100001113 ANKIT TIWARI', 'DIRECT',
+            '900100001031 CHANCHALA DARSHAN(RAJ KUMAR)',
+            '900100001149 Suresh Kumar Sethi', '700106801257 MR. VINIT KUMAR',
+            '900100001260 MR. MAYUR CHANDRAKANT DAVE', '700118101217 DEEPAK SAWHNEY',
+            '900100001044 RAJAN KUMAR (ABHIMANYU)', '900100001079 ABHAY KUMAR',
+            '900100001195 SHREY VERMA', '900100001209 SATNAM',
+            '900100001256 MR. SANJAY KUMAR GARG', '900100001261 UDAY VEER SHARMA',
+            '900100001263 RONAK GUPTA', '700120701269 MRS. BABY CHAUHAN',
+            '900100001029 KOMAL GOYAL(PARVEEN GARG)', '900100001056 Tarun Kumar sharma',
+            '900100001207 RAMAVTAR GUPTA', '900100001222 SAPNA W/O YATENDRA KUMAR',
+            '900100001229 VINOD KUMAR', '900100001266 MR.  NARESH KUMAR GUPTA',
+            '900100001138 BARUN KUMAR SINGH', '900100001272 SHALINI PATHAK',
+            '900100001273 ANURAG AWASTHI', '700120701271 MR. LOKESH KUMAR',
+            '700101201181 Saurabh', '900100001276 NARENDER',
+            '900100001277  Neeraj Sehgal', '900100001071 SHIV SHANKAR',
+            '900100001030 REKHA GUPTA(NEERAJ GUPTA)', '900100001253 MRS. PREETY CHAUDHARY',
+            '900100001033 Viyom Chandra', '900100001278 SHAMINDER SINGH'
+        ];
+
+        document.getElementById('fileinput').addEventListener('change', function() {
+            const file = this.files[0];
+            if (file) {
+                const nameEl = document.getElementById('filename');
+                nameEl.textContent = '📄 ' + file.name + '  (' + (file.size / 1024).toFixed(1) + ' KB)';
+                nameEl.style.display = 'block';
+            }
+        });
+
+        // --- search dropdown ---
+        const input = document.getElementById("searchinput");
+        const list = document.getElementById("dropdownlist");
+
+        input.addEventListener('input', () => {
+            const q = input.value.toLowerCase();
+            const filtered = options.filter(o => o.toLowerCase().includes(q));
+            list.innerHTML = '';
+            filtered.forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'dd-item';
+                div.textContent = item;
+                div.addEventListener('mousedown', () => {
+                    input.value = item;
+                    list.classList.remove('open');
+                });
+                list.appendChild(div);
+            });
+            list.classList.toggle('open', filtered.length > 0);
+        });
+
+        input.addEventListener('blur', () => {
+            setTimeout(() => list.classList.remove('open'), 150);
+        });
+
+        input.addEventListener('focus', () => {
+            if (input.value) input.dispatchEvent(new Event('input'));
+        });
+
+
+        // --- submit ---
+        document.getElementById('submitbutton').addEventListener('click', () => {
+            const file = document.getElementById('fileinput').files[0];
+            const associate = input.value.trim();
+            const cr = document.getElementById('cr').value.trim();
+            const cg = document.getElementById('cg').value.trim();
+            
+
+            if (!file)      { alert('Please upload a PDF'); return; }
+            if (!associate) { alert('Please select an associate'); return; }
+            if (!cr)        { alert('Please enter commission received'); return; }
+            if (!cg)        { alert('Please enter commission gave'); return; }
+            if (!paymentStatus) { alert('Please select Payment Status!'); return; }
+
+            const btn = document.getElementById('submitbutton');
+            btn.textContent = 'Processing...';
+            btn.disabled = true;
+
+
+            const formdata = new FormData();
+            formdata.append('pdf', file);
+            formdata.append('associate', associate);
+            formdata.append('cr', cr);
+            formdata.append('cg', cg);
+            formdata.append('payment_status',paymentStatus);
+
+            fetch('/submit', {
+                method: 'POST',
+                body: formdata
+            })
+            .then(res => res.json())
+            .then(data => {
+                btn.textContent = 'Submit';
+                btn.disabled = false;
+
+            // ── build table ──────────────────────────────────
+
+                const table = document.getElementById('result-table');
+                table.innerHTML = '';
+
+            // header row
+                const thead = table.createTHead();
+                const hrow  = thead.insertRow();
+                data.columns.forEach(col => {
+                    const th = document.createElement('th');
+                    th.textContent = col;
+                    hrow.appendChild(th);
+                });
+
+            // data rows
+                const tbody = table.createTBody();
+                data.rows.forEach(row => {
+                    const tr = tbody.insertRow();
+                    row.forEach(cell => {
+                        const td = tr.insertCell();
+                        td.textContent = cell;
+                        td.contentEditable = true; 
+                    });
+                });
+
+                document.getElementById('result-wrap').style.display = 'block';
+                document.getElementById('result-wrap').scrollIntoView({ behavior: 'smooth' });
+                document.getElementById('punch-wrap').style.display = 'flex'; 
+            })
+            .catch(err => {
+                btn.textContent = 'Submit';
+                btn.disabled = false;
+                alert('Error: ' + err.message);
+            });
+        });
+
+        document.getElementById('punchbutton').addEventListener('click',() =>{
+            const  table = document.getElementById('result-table');
+            const headers = [...table.querySelectorAll('thead th')].map(th => th.textContent);
+            const rows    = [...table.querySelectorAll('tbody tr')].map(tr =>
+                [...tr.querySelectorAll('td')].map(td => td.textContent)
+            );
+            const record = {};
+            headers.forEach((col, i) => record[col] = rows[0][i]);
+            const btn = document.getElementById('punchbutton');
+            btn.textContent = 'Punching...';
+            btn.disabled = true;
+            fetch('/punch', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ record })
+            })
+            .then(res => res.json())
+            .then(data => {
+                btn.textContent = 'Punch';
+                btn.disabled = false;
+                if (data.status === 'ok') {
+                    alert('✅ Record punched successfully!');
+                } else {
+                    alert('❌ Error: ' + data.message);
+                }
+            })
+            .catch(err => {
+                btn.textContent = 'Punch';
+                btn.disabled = false;
+                alert('Error: ' + err.message);
+            });
+            
+        });
+    </script>
+</body>
+</html>
