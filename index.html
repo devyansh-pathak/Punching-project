@@ -186,9 +186,10 @@
         <div class="field">
             <label>Payemnt Status</label>
             <div style="display:flex; gap:10px;">
-                <button type="button" id="btn-c2p" style="padding:9px 24px; font-size:14px; font-weight:bold; background:#e0d7ff; color:#6366f1; border:2px solid #6366f1; border-radius:8px; cursor:pointer;">C2P</button>
-                <button type="button" id="btn-done" style="padding:9px 24px; font-size:14px; font-weight:bold; background:#dcfce7; color:#22c55e; border:2px solid #22c55e; border-radius:8px; cursor:pointer;">Done</button>
-                <button type="button" id="btn-pending" style="padding:9px 24px; font-size:14px; font-weight:bold; background:#ffedd5; color:#f97316; border:2px solid #f97316; border-radius:8px; cursor:pointer;">Pending</button>
+                <button type="button" id="btn-c2pdone" style="padding:9px 24px; font-size:14px; font-weight:bold; background:#e0d7ff; color:#6366f1; border:2px solid #6366f1; border-radius:8px; cursor:pointer;">C2P-DONE</button>
+                <button type="button" id="btn-c2ppending" style="padding:9px 24px; font-size:14px; font-weight:bold; background:#dcfce7; color:#22c55e; border:2px solid #22c55e; border-radius:8px; cursor:pointer;">C2P-PENDING</button>
+                <button type="button" id="btn-monthlypending" style="padding:9px 24px; font-size:14px; font-weight:bold; background:#ffedd5; color:#f97316; border:2px solid #f97316; border-radius:8px; cursor:pointer;">MONTHLY-PENDING</button>
+                <button type="button" id="btn-monthlydone" style="padding:9px 24px; font-size:14px; font-weight:bold; background:#7ad2fe; color:#7ad2fe; border:2px solid #7ad2fe; border-radius:8px; cursor:pointer;">MONTHLY-DONE</button>
             </div>
         </div>
 
@@ -216,16 +217,18 @@
 
     <script>
         let paymentStatus = '';
-        document.getElementById('btn-c2p').addEventListener('click', () => setStatus('C2P'));
-        document.getElementById('btn-done').addEventListener('click', () => setStatus('Done'));
-        document.getElementById('btn-pending').addEventListener('click', () => setStatus('Pending'));
+        document.getElementById('btn-c2pdone').addEventListener('click', () => setStatus('C2P-DONE'));
+        document.getElementById('btn-c2ppending').addEventListener('click', () => setStatus('C2P-PENDING'));
+        document.getElementById('btn-monthlypending').addEventListener('click', () => setStatus('MONTHLY-PENDNIG'));
+        document.getElementById('btn-monthlydone').addEventListener('click', () => setStatus('MONTHLY-DONE'));
 
 
         function setStatus(status) {
             paymentStatus = status;
-            document.getElementById('btn-c2p').style.opacity     = status === 'C2P'     ? '1' : '0.4';
-            document.getElementById('btn-done').style.opacity    = status === 'Done'    ? '1' : '0.4';
-            document.getElementById('btn-pending').style.opacity = status === 'Pending' ? '1' : '0.4';
+            document.getElementById('btn-c2pdone').style.opacity     = status === 'C2P-DONE'     ? '1' : '0.4';
+            document.getElementById('btn-c2ppending').style.opacity    = status === 'C2P-PENDING'    ? '1' : '0.4';
+            document.getElementById('btn-monthlypending').style.opacity = status === 'MONTHLY-PENDNIG' ? '1' : '0.4';
+            document.getElementById('btn-monthlydone').style.opacity = status === 'MONTHLY-DONE' ? '1' : '0.4';
         }
         const options = ['800100001013 BIRENDERA PRASAD', '900100001139 NAVEEN GUPTA',
             '900100001184 HARSHIT BANSAL', '800100001014 ROHUL AMIN SHEIKH',
