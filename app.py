@@ -193,7 +193,10 @@ def list_ans(rag_retriever,llm):
         "what is the total tax on policy",
         "what is the policy type, answer ONLY one of these: ONLY TP(Third party), ONLY OD(Own damage), COMPREHENSIVE (TP and OD)",
         "What is the vehicle registration number, it follows format like DL1234AB5678 or MH-02AB-1234, return ONLY the registration number nothing else",
-        "what is the name of Insured name"
+        "what is the name of Insured name",
+        "what is the fuel of the vehicle",
+        "what is the policy issue date write all dates in a similar format",
+        "what is the name of broker choose from them mostly: POLICYBAZAR , INSURANCEDEKHO , SHALINI PATHAK , KOMAL "
     ]
     def run(q):
         return generate_output(q, rag_retriever, llm)
@@ -218,20 +221,26 @@ def punching(filename, associate, cr, cg,payment):
     llm=llm_initialize(api_key)
     ans_list=list_ans(rag_retriever,llm)
     df = pd.DataFrame([{
-        'Company':            ans_list[0],
+        'Policy issue Date':  ans_list[11], 
         'client name':        ans_list[9],
-        'Policy Type':        ans_list[7],
-        'Associate':          associate,
-        'Vehicle info':       ans_list[5],
         'Registration no.':   ans_list[8],
-        'Total Amount':       ans_list[1],
-        'TP Amount':          ans_list[4],
+        'Vehicle info':       ans_list[5],
+        'Policy Type':        ans_list[7],
+        'Fuel':               ans_list[10],
+        'GVW/Seating capacity': "To be filled",             
+        'Company':            ans_list[0],
+        'online/offline':     "To be filled",
+        'broker':             ans_list[12],
         'OD Premium':         ans_list[3],
-        'Premium Before Tax': ans_list[2],
+        'TP Amount':          ans_list[4],
         'Total Tax':          ans_list[6],
+        'Total Amount':       ans_list[1],
+        'Commission premium':"To be filled",
         'Commision Recieved':  f"{cr} %",
         'Commission given':    f"{cg} %",
-        'payment_status':      payment
+        'Associate':          associate,
+        'payment_status':      payment,
+        'Remarks':            "To be filled/No remarks "
     }])
 
     return jsonify({
