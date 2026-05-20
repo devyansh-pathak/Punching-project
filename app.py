@@ -172,23 +172,28 @@ def generate_output(query , retriever , llm , top_k=3):
     context = "\n".join(doc["document"] for doc in results) if results else ""
     if not context:
         print("we found no context for given query")
-    prompt = f"""use given context to generate the answer for query
-                    ,provide only the one word info or the amount asked or required usefull info:{query},
+    prompt = f"""You are an insurance document parser.
+                Answer ONLY from the given context.
+                Be extremely precise and concise.
+                For policy type question: reply ONLY 'TP' or 'OD' or 'COMPREHENSIVE' nothing else.
+                For amounts: reply ONLY the number, no text.
+                  query:{query},
                   context:{context}"""
     response = llm.invoke([prompt.format(context = context ,  query = query)])
     return response.content
 from concurrent.futures import ThreadPoolExecutor
 def list_ans(rag_retriever,llm):
     queries = [
-        "what is the company name",
-        "what is the total amount",
+        "what is the company name only",
+        "what is the total amount in rupees",
         "what is total premium before tax evaluation",
-        "what is Net OD Premium (if applicable)",
-        "what is Net TP Premium",
-        "what is Vehicle type ",
+        "what is the Net OD Premium amount, return 0 if not applicable",
+        "what is the TP (Third Party) premium amount only",
+        "what is the vehicle type like Two Wheeler or Four Wheeler",
         "what is the total tax on policy",
-        "what is the type of policy [ONLY TP , ONLY OD  , COMPREHENSIVE]",
-        "What is the regestration number"
+        "what is the policy type, answer ONLY one of these: TP, OD, COMPREHENSIVE",
+        "What is the vehicle registration number, it follows format like DL1234AB5678 or MH02AB1234, return ONLY the registration number nothing else",
+        "what is the name of Insured name"
     ]
     def run(q):
         return generate_output(q, rag_retriever, llm)
@@ -214,6 +219,7 @@ def punching(filename, associate, cr, cg,payment):
     ans_list=list_ans(rag_retriever,llm)
     df = pd.DataFrame([{
         'Company':            ans_list[0],
+        'client name':        ans_list[9],
         'Policy Type':        ans_list[7],
         'Associate':          associate,
         'Vehicle info':       ans_list[5],
@@ -223,9 +229,9 @@ def punching(filename, associate, cr, cg,payment):
         'OD Premium':         ans_list[3],
         'Premium Before Tax': ans_list[2],
         'Total Tax':          ans_list[6],
-        'Commision Recieved':  cr,
-        'Commission given':    cg,
-        'payment_status': payment
+        'Commision Recieved':  f"{cr} %",
+        'Commission given':    f"{cg} %",
+        'payment_status':      payment
     }])
 
     return jsonify({
