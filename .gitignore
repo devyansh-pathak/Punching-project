@@ -1,0 +1,8 @@
+credentials.json
+uploads/
+data/
+__pycache__/
+*.pyc
+model_cache/
+data/
+uploads/
