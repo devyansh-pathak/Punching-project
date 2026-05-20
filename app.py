@@ -7,6 +7,7 @@ from langchain_groq import ChatGroq
 from langchain_community.document_loaders.pdf import PyPDFLoader
 
 os.environ['SENTENCE_TRANSFORMERS_HOME'] = './model_cache'
+api_key = os.environ.get('GROQ_API_KEY')
 
 
 app=Flask(__name__)
