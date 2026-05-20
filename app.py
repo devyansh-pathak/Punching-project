@@ -249,19 +249,26 @@ def submit():
 
 import gspread
 from google.oauth2.service_account import Credentials
+import json
 def save_to_sheet(record):
-    creds=Credentials.from_service_account_file(
-        "credentials.json",
+    creds_json = os.environ.get('GOOGLE_CREDENTIALS')
+    creds_dict = json.loads(creds_json)
+    
+    creds = Credentials.from_service_account_info(
+        creds_dict,
         scopes=[
-            "https://spreadsheets.google.com/feeds",
-            "https://www.googleapis.com/auth/drive"
+            'https://spreadsheets.google.com/feeds',
+            'https://www.googleapis.com/auth/drive'
         ]
     )
-    client=gspread.authorize(creds)
+    client = gspread.authorize(creds)
     sheet  = client.open("Punching").sheet1
-    if sheet.row_count==1 and sheet.row_values(1)==[]:
+
+    if sheet.row_count == 1 and sheet.row_values(1) == []:
         sheet.append_row(list(record.keys()))
+
     sheet.append_row(list(record.values()))
+
 
 @app.route('/punch', methods=['POST'])
 def punch():
