@@ -194,9 +194,9 @@ def list_ans(rag_retriever,llm):
         "what is the policy type, answer ONLY one of these: ONLY TP(Third party), ONLY OD(Own damage), COMPREHENSIVE (TP and OD)",
         "What is the vehicle registration number, it follows format like DL1234AB5678 or MH-02AB-1234, return ONLY the registration number nothing else",
         "what is the name of Insured name",
-        "what is the fuel of the vehicle",
+        "what is the fuel of the vehicle chose from:( PETROL , CNG , DISEL , ELECTRIC ) IF vehicle type is two wheeler it is more likely to be PETROL",
         "what is the policy issue date write all dates in a similar format",
-        "what is the name of broker choose from them mostly: POLICYBAZAR , INSURANCEDEKHO , SHALINI PATHAK , KOMAL "
+        "what is the name of broker choose from them mostly: POLICYBAZAAR , INSURANCE DEKHO , SHALINI PATHAK , KOMAL "
     ]
     def run(q):
         return generate_output(q, rag_retriever, llm)
