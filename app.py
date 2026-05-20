@@ -6,7 +6,7 @@ import pandas as pd
 from langchain_groq import ChatGroq
 from langchain_community.document_loaders.pdf import PyPDFLoader
 
-
+os.environ['SENTENCE_TRANSFORMERS_HOME'] = './model_cache'
 
 
 app=Flask(__name__)
@@ -42,6 +42,7 @@ from sentence_transformers import SentenceTransformer
 class EmbeddingManager:
     def __init__(self,model_name= "sentence-transformers/all-MiniLM-L6-v2"):
         self.model_name = model_name
+        self.model = SentenceTransformer(self.model_name)
         print("loading model....",self.model_name)
         self.model = SentenceTransformer(self.model_name)
         print("embedding dimensions = ",self.model.get_sentence_embedding_dimension())
@@ -194,7 +195,7 @@ def list_ans(rag_retriever,llm):
         results = list(executor.map(run, queries))
 
         return results
-
+groq_api_key = os.getenv("GROQ_API_KEY")
 embedding_manager=EmbeddingManager()
 def punching(filename, associate, cr, cg,payment):
     all_docs=loader(f'uploads/{filename}')
@@ -207,7 +208,7 @@ def punching(filename, associate, cr, cg,payment):
     embeddings = embedding_manager.generate_embeddings(texts)
     vector_store.add_documents(chunk,embeddings)
     rag_retriever=RAGretriever(embedding_manager,vector_store)
-    api_key = "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"
+    api_key = groq_api_key
     llm=llm_initialize(api_key)
     ans_list=list_ans(rag_retriever,llm)
     df = pd.DataFrame([{
@@ -261,7 +262,7 @@ def save_to_sheet(record):
     if sheet.row_count==1 and sheet.row_values(1)==[]:
         sheet.append_row(list(record.keys()))
     sheet.append_row(list(record.values()))
-import openpyxl
+
 @app.route('/punch', methods=['POST'])
 def punch():
     try:
@@ -278,4 +279,4 @@ def punch():
     
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host='0.0.0.0', port=7860)
