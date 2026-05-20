@@ -191,8 +191,8 @@ def list_ans(rag_retriever,llm):
         "what is the TP (Third Party) premium amount only",
         "what is the vehicle type like Two Wheeler or Four Wheeler",
         "what is the total tax on policy",
-        "what is the policy type, answer ONLY one of these: TP, OD, COMPREHENSIVE",
-        "What is the vehicle registration number, it follows format like DL1234AB5678 or MH02AB1234, return ONLY the registration number nothing else",
+        "what is the policy type, answer ONLY one of these: ONLY TP(Third party), ONLY OD(Own damage), COMPREHENSIVE (TP and OD)",
+        "What is the vehicle registration number, it follows format like DL1234AB5678 or MH-02AB-1234, return ONLY the registration number nothing else",
         "what is the name of Insured name"
     ]
     def run(q):
@@ -223,7 +223,7 @@ def punching(filename, associate, cr, cg,payment):
         'Policy Type':        ans_list[7],
         'Associate':          associate,
         'Vehicle info':       ans_list[5],
-        'Regestration no.':   ans_list[8],
+        'Registration no.':   ans_list[8],
         'Total Amount':       ans_list[1],
         'TP Amount':          ans_list[4],
         'OD Premium':         ans_list[3],
