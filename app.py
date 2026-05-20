@@ -173,7 +173,7 @@ def generate_output(query , retriever , llm , top_k=3):
     if not context:
         print("we found no context for given query")
     prompt = f"""use given context to generate the answer for query
-                  query provide only the one word info or the amount asked or required usefull info:{query},
+                    ,provide only the one word info or the amount asked or required usefull info:{query},
                   context:{context}"""
     response = llm.invoke([prompt.format(context = context ,  query = query)])
     return response.content
@@ -184,11 +184,11 @@ def list_ans(rag_retriever,llm):
         "what is the total amount",
         "what is total premium before tax evaluation",
         "what is Net OD Premium (if applicable)",
-        "what is TP amount",
+        "what is Net TP Premium",
         "what is Vehicle type ",
         "what is the total tax on policy",
         "what is the type of policy [ONLY TP , ONLY OD  , COMPREHENSIVE]",
-        "What is the vehicle's regestration number"
+        "What is the regestration number"
     ]
     def run(q):
         return generate_output(q, rag_retriever, llm)
