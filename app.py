@@ -161,13 +161,13 @@ from langchain_groq import ChatGroq
 def llm_initialize(api_key):
     llm=ChatGroq(
         groq_api_key = api_key,
-        model_name = "llama-3.1-8b-instant",
+        model_name = "gemma2-9b-it",
         temperature = 0.1,
         max_tokens= 200
     )
     return llm
 
-def generate_output(query , retriever , llm , top_k=3):
+def generate_output(query , retriever , llm , top_k=2):
     results = retriever.retrieve(query, top_k)
     context = "\n".join(doc["document"] for doc in results) if results else ""
     if not context:
@@ -200,7 +200,7 @@ def list_ans(rag_retriever,llm):
     ]
     def run(q):
         return generate_output(q, rag_retriever, llm)
-    with ThreadPoolExecutor() as executor:
+    with ThreadPoolExecutor(max_workers=2) as executor:
         results = list(executor.map(run, queries))
 
         return results
