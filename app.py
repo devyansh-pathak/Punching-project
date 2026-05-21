@@ -191,7 +191,7 @@ def list_ans(rag_retriever,llm):
         "what is the TP (Third Party) premium amount only",
         "what is the vehicle type like Two Wheeler or Four Wheeler",
         "what is the total tax on policy",
-        "what is the policy type, answer ONLY one of these: ONLY TP(Third party), ONLY OD(Own damage), COMPREHENSIVE (TP and OD)",
+        "what is the policy type, answer ONLY one of these: ONLY TP(Third party/ liability only), ONLY OD(Own damage), COMPREHENSIVE (TP and OD)",
         "What is the vehicle registration number, it follows format like DL1234AB5678 or MH-02AB-1234, return ONLY the registration number nothing else",
         "what is the name of Insured name",
         "what is the fuel of the vehicle chose from:( PETROL , CNG , DISEL , ELECTRIC ) IF vehicle type is two wheeler it is more likely to be PETROL",
