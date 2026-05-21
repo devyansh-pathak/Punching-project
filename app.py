@@ -7,7 +7,7 @@ from langchain_groq import ChatGroq
 from langchain_community.document_loaders.pdf import PyPDFLoader
 
 os.environ['SENTENCE_TRANSFORMERS_HOME'] = './model_cache'
-api_key = os.environ.get('GROQ_API_KEY')
+api_key = os.environ.get('GEMINI_API_KEY')
 
 
 app=Flask(__name__)
@@ -157,13 +157,12 @@ class RAGretriever:
     
 
 
-from langchain_groq import ChatGroq
+from langchain_google_genai import ChatGoogleGenerativeAI
 def llm_initialize(api_key):
-    llm=ChatGroq(
-        groq_api_key = api_key,
-        model_name = "llama-3.1-8b-instant",
-        temperature = 0.1,
-        max_tokens= 200
+    llm = ChatGoogleGenerativeAI(
+        model="gemini-1.5-flash",
+        google_api_key=api_key,
+        temperature=0.1
     )
     return llm
 
@@ -204,7 +203,7 @@ def list_ans(rag_retriever,llm):
         results = list(executor.map(run, queries))
 
         return results
-groq_api_key = os.getenv("GROQ_API_KEY")
+gemini_api_key = os.getenv("GEMINI_API_KEY")
 embedding_manager=EmbeddingManager()
 def punching(filename, associate, cr, cg,payment):
     all_docs=loader(f'uploads/{filename}')
@@ -217,7 +216,7 @@ def punching(filename, associate, cr, cg,payment):
     embeddings = embedding_manager.generate_embeddings(texts)
     vector_store.add_documents(chunk,embeddings)
     rag_retriever=RAGretriever(embedding_manager,vector_store)
-    api_key = groq_api_key
+    api_key = gemini_api_key
     llm=llm_initialize(api_key)
     ans_list=list_ans(rag_retriever,llm)
     df = pd.DataFrame([{

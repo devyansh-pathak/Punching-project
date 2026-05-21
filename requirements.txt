@@ -16,3 +16,4 @@ google-auth
 gunicorn
 gunicorn==21.2.0
 pypdf
+langchain-google-genai
