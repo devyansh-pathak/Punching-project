@@ -161,7 +161,7 @@ from langchain_groq import ChatGroq
 def llm_initialize(api_key):
     llm=ChatGroq(
         groq_api_key = api_key,
-        model_name = "gemma2-9b-it",
+        model_name = "llama-3.1-8b-instant",
         temperature = 0.1,
         max_tokens= 200
     )
